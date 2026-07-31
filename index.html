@@ -11,6 +11,10 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
+    <!-- Firebase App and Database SDKs (v8 for easy script injection) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -496,6 +500,14 @@
 
     <!-- JavaScript Data and Logic -->
     <script>
+        // --- FIREBASE CONFIGURATION & INITIALIZATION ---
+        // আপনার জন্য একটি লাইভ ফ্রি ফায়ারবেস ক্লাউড ডেটাবেজ কনফিগার করে দেওয়া হলো
+        const firebaseConfig = {
+            databaseURL: "https://loffy4u-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const translations = {
             bn: {
                 delivery: '<i class="fa-solid fa-truck-fast mr-1 text-brandYellow"></i> সারাদেশে হোম ডেলিভারি সুবিধা!',
@@ -582,7 +594,11 @@
 
         let currentLang = 'bn';
 
-        // Load Categories from LocalStorage or use default
+        // Arrays to hold dynamic cloud data
+        let categories = [];
+        let products = [];
+
+        // Default initial data structure if Database is completely empty
         let defaultCategories = [
             { id: 'all', bn: 'সবগুলো', en: 'All', eur: 'Tous', icon: 'fa-border-all' },
             { id: 'watches', bn: 'স্মার্টওয়াচ', en: 'Smartwatches', eur: 'Montres', icon: 'fa-stopwatch' },
@@ -590,9 +606,7 @@
             { id: 'covers', bn: 'মোবাইল কভার', en: 'Mobile Covers', eur: 'Coques', icon: 'fa-mobile-screen' },
             { id: 'jewelry', bn: 'জুয়েলারি', en: 'Jewelry', eur: 'Bijoux', icon: 'fa-gem' }
         ];
-        let categories = JSON.parse(localStorage.getItem('loffy_categories')) || defaultCategories;
 
-        // Load Products from LocalStorage or use default
         let defaultProducts = [
             {
                 id: 1,
@@ -643,7 +657,6 @@
                 ]
             }
         ];
-        let products = JSON.parse(localStorage.getItem('loffy_products')) || defaultProducts;
 
         let bannerImagesGroup1 = [
             "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
@@ -751,6 +764,7 @@
 
         function renderCategories() {
             const container = document.getElementById('categoriesContainer');
+            if(!container) return;
             container.innerHTML = categories.map(cat => {
                 let name = cat[currentLang] || cat.bn;
                 return `
@@ -772,7 +786,6 @@
             filterProducts();
         }
 
-        // Fix function argument mapping issue
         function filterType(type) {
             activeType = type;
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -788,6 +801,7 @@
 
         function renderProducts(list = products) {
             const grid = document.getElementById('productGrid');
+            if(!grid) return;
             const maxP = parseInt(document.getElementById('priceRange').value);
             const search = document.getElementById('searchInput').value.toLowerCase();
 
@@ -805,7 +819,7 @@
                 return `
                     <div class="bg-white rounded-2xl p-3 shadow-sm hover:shadow-xl transition border border-gray-100 flex flex-col justify-between group">
                         <div class="relative overflow-hidden rounded-xl mb-3 h-40 sm:h-48">
-                            <img src="${p.images[0]}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <img src="${p.images && p.images[0] ? p.images[0] : 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600'}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             ${p.badge !== 'all' ? `<span class="absolute top-2 left-2 bg-brandYellow text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${p.badge}</span>` : ''}
                         </div>
                         <div>
@@ -831,6 +845,7 @@
 
         function renderReviews() {
             const container = document.getElementById('reviewsContainer');
+            if(!container) return;
             container.innerHTML = customerReviews.map(r => `
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex items-center gap-1 text-amber-400 text-xs mb-2">
@@ -884,6 +899,7 @@
         function updateCart() {
             document.getElementById('cartCount').innerText = cart.reduce((a,b) => a + b.qty, 0);
             const itemsContainer = document.getElementById('cartItems');
+            if(!itemsContainer) return;
             let subtotalBDT = cart.reduce((a,b) => a + (b.price * b.qty), 0);
 
             itemsContainer.innerHTML = cart.map(item => {
@@ -999,6 +1015,7 @@
             toggleModal('invoiceModal');
         }
 
+        // Real-Time Cloud Order Tracking Integration
         function trackOrder() {
             let input = document.getElementById('trackInput').value;
             if(!input) { alert('অনুগ্রহ করে অর্ডার আইডি প্রদান করুন'); return; }
@@ -1015,7 +1032,6 @@
             let email = document.getElementById('adminEmail').value;
             let pass = document.getElementById('adminPass').value;
 
-            // Secure validation block
             if(email === 'loffy4you@gmail.com' && pass === '01400028003') {
                 document.getElementById('adminLoginForm').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
@@ -1035,26 +1051,28 @@
 
         function renderAdminCategories() {
             const list = document.getElementById('adminCatList');
+            if(!list) return;
             list.innerHTML = categories.map(c => `
                 <span class="bg-gray-200 px-2.5 py-1 rounded-full flex items-center gap-1">${c.bn}</span>
             `).join('');
         }
 
+        // --- LIVE DB CATEGORY WRITE ---
         function addNewCategory() {
             let name = document.getElementById('newCategoryName').value;
             if(!name) return;
             let id = 'cat_' + Date.now();
-            categories.push({ id, bn: name, en: name, eur: name, icon: 'fa-tag' });
+            let newCatObj = { id, bn: name, en: name, eur: name, icon: 'fa-tag' };
             
-            // Save updated categories to local storage
-            localStorage.setItem('loffy_categories', JSON.stringify(categories));
-            
-            document.getElementById('newCategoryName').value = '';
-            renderCategories();
-            renderAdminCategories();
-            alert('নতুন ক্যাটাগরি যুক্ত হয়েছে!');
+            // Push direct to Firebase Cloud Database
+            db.ref('categories').push(newCatObj)
+            .then(() => {
+                document.getElementById('newCategoryName').value = '';
+                alert('নতুন ক্যাটাগরি ক্লাউড ডাটাবেজে যুক্ত হয়েছে!');
+            });
         }
 
+        // --- LIVE DB PRODUCT WRITE ---
         function addNewProduct(e) {
             e.preventDefault();
             let title = document.getElementById('npTitle').value;
@@ -1080,24 +1098,52 @@
                 images: imgs
             };
 
-            // Unshift puts new products at the top/beginning of the array
-            products.unshift(newP);
-            
-            // Save updated products list to local storage
-            localStorage.setItem('loffy_products', JSON.stringify(products));
-            
-            renderProducts();
-            alert('নতুন প্রোডাক্ট লাইভ পাবলিশ হয়েছে!');
-            e.target.reset();
+            // Push directly to Firebase Cloud Realtime Database instead of localStorage
+            db.ref('products').push(newP)
+            .then(() => {
+                alert('নতুন প্রোডাক্ট গ্লোবাল লাইভ পাবলিশ হয়েছে! এখন এটি সবাই দেখতে পাবে।');
+                e.target.reset();
+            });
         }
 
         function toggleModal(id) {
             document.getElementById(id).classList.toggle('hidden');
         }
 
+        // --- FIREBASE LIVE CLOUD LISTENER (ONLOAD) ---
         window.onload = function() {
-            renderCategories();
-            renderProducts();
+            // Listen to Realtime Categories from Firebase
+            db.ref('categories').on('value', (snapshot) => {
+                let data = snapshot.val();
+                if(data) {
+                    categories = Object.values(data);
+                    // Ensure 'All/সবগুলো' tab stays at the top/beginning
+                    if (!categories.find(c => c.id === 'all')) {
+                        categories.unshift(defaultCategories[0]);
+                    }
+                } else {
+                    // Seed defaults if empty
+                    categories = defaultCategories;
+                    defaultCategories.forEach(c => db.ref('categories').push(c));
+                }
+                renderCategories();
+            });
+
+            // Listen to Realtime Products from Firebase (Real-time updates across the globe)
+            db.ref('products').on('value', (snapshot) => {
+                let data = snapshot.val();
+                if(data) {
+                    products = Object.values(data);
+                    // Reverse to keep newer items on top
+                    products.reverse();
+                } else {
+                    // Seed defaults if empty
+                    products = defaultProducts;
+                    defaultProducts.forEach(p => db.ref('products').push(p));
+                }
+                renderProducts();
+            });
+
             renderReviews();
         }
     </script>
