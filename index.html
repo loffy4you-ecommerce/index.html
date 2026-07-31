@@ -390,7 +390,7 @@
         <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
             <button onclick="toggleModal('adminModal')" class="absolute top-4 right-4 text-gray-400 hover:text-black text-xl"><i class="fa-solid fa-xmark"></i></button>
 
-            <!-- Login Form (Updated Secure Inputs) -->
+            <!-- Login Form -->
             <div id="adminLoginForm">
                 <h3 class="text-2xl font-bold mb-4 text-brandGreen text-center"><i class="fa-solid fa-lock"></i> অ্যাডমিন লগইন</h3>
                 <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-md mx-auto" autocomplete="off">
@@ -501,7 +501,6 @@
     <!-- JavaScript Data and Logic -->
     <script>
         // --- FIREBASE CONFIGURATION & INITIALIZATION ---
-        // আপনার জন্য একটি লাইভ ফ্রি ফায়ারবেস ক্লাউড ডেটাবেজ কনফিগার করে দেওয়া হলো
         const firebaseConfig = {
             databaseURL: "https://loffy4u-default-rtdb.firebaseio.com/"
         };
@@ -593,12 +592,9 @@
         };
 
         let currentLang = 'bn';
-
-        // Arrays to hold dynamic cloud data
         let categories = [];
         let products = [];
 
-        // Default initial data structure if Database is completely empty
         let defaultCategories = [
             { id: 'all', bn: 'সবগুলো', en: 'All', eur: 'Tous', icon: 'fa-border-all' },
             { id: 'watches', bn: 'স্মার্টওয়াচ', en: 'Smartwatches', eur: 'Montres', icon: 'fa-stopwatch' },
@@ -632,49 +628,20 @@
                     "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=600",
                     "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600"
                 ]
-            },
-            {
-                id: 3,
-                title: { bn: "Luxury Gold Plated Ring", en: "Luxury Gold Plated Ring", eur: "Bague Plaquée Or de Luxe" },
-                price: 650,
-                category: "jewelry",
-                badge: "offer",
-                offerTime: 8,
-                images: [
-                    "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600",
-                    "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600"
-                ]
-            },
-            {
-                id: 4,
-                title: { bn: "iPhone Electroplated Cover", en: "iPhone Electroplated Cover", eur: "Coque Électroplaquée iPhone" },
-                price: 450,
-                category: "covers",
-                badge: "all",
-                offerTime: 0,
-                images: [
-                    "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600"
-                ]
             }
         ];
 
         let bannerImagesGroup1 = [
             "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
-            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=1200",
-            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=1200",
-            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=1200"
+            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=1200"
         ];
-
         let bannerImagesGroup2 = [
             "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=800",
-            "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800",
-            "https://images.unsplash.com/photo-1508296695146-257a814070b4?w=800"
+            "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800"
         ];
-
         let bannerImagesGroup3 = [
             "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200",
-            "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200",
-            "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200"
+            "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200"
         ];
 
         let customerReviews = [
@@ -686,7 +653,6 @@
         let cart = [];
         let activeCategory = 'all';
         let activeType = 'all';
-
         let b1Idx = 0, b2Idx = 0, b3Idx = 0;
         
         function rotateBanners() {
@@ -778,6 +744,7 @@
             if(npCat) {
                 npCat.innerHTML = categories.filter(c => c.id !== 'all').map(c => `<option value="${c.id}">${c[currentLang] || c.bn}</option>`).join('');
             }
+            renderAdminCategories();
         }
 
         function selectCategory(catId) {
@@ -890,7 +857,7 @@
                 item.qty++;
             } else {
                 const p = products.find(x => x.id === id);
-                cart.push({ ...p, qty: 1 });
+                if(p) cart.push({ ...p, qty: 1 });
             }
             updateCart();
             alert('প্রোডাক্ট কার্টে যুক্ত করা হয়েছে!');
@@ -1015,7 +982,6 @@
             toggleModal('invoiceModal');
         }
 
-        // Real-Time Cloud Order Tracking Integration
         function trackOrder() {
             let input = document.getElementById('trackInput').value;
             if(!input) { alert('অনুগ্রহ করে অর্ডার আইডি প্রদান করুন'); return; }
@@ -1026,7 +992,6 @@
             toggleModal('adminModal');
         }
 
-        // --- SECURE LOGIN LOGIC ---
         function handleAdminLogin(e) {
             e.preventDefault();
             let email = document.getElementById('adminEmail').value;
@@ -1035,7 +1000,7 @@
             if(email === 'loffy4you@gmail.com' && pass === '01400028003') {
                 document.getElementById('adminLoginForm').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
-                renderAdminCategories();
+                renderCategories();
                 document.getElementById('adminEmail').value = '';
                 document.getElementById('adminPass').value = '';
             } else {
@@ -1057,14 +1022,12 @@
             `).join('');
         }
 
-        // --- LIVE DB CATEGORY WRITE ---
         function addNewCategory() {
-            let name = document.getElementById('newCategoryName').value;
+            let name = document.getElementById('newCategoryName').value.trim();
             if(!name) return;
             let id = 'cat_' + Date.now();
             let newCatObj = { id, bn: name, en: name, eur: name, icon: 'fa-tag' };
             
-            // Push direct to Firebase Cloud Database
             db.ref('categories').push(newCatObj)
             .then(() => {
                 document.getElementById('newCategoryName').value = '';
@@ -1072,7 +1035,6 @@
             });
         }
 
-        // --- LIVE DB PRODUCT WRITE ---
         function addNewProduct(e) {
             e.preventDefault();
             let title = document.getElementById('npTitle').value;
@@ -1098,7 +1060,6 @@
                 images: imgs
             };
 
-            // Push directly to Firebase Cloud Realtime Database instead of localStorage
             db.ref('products').push(newP)
             .then(() => {
                 alert('নতুন প্রোডাক্ট গ্লোবাল লাইভ পাবলিশ হয়েছে! এখন এটি সবাই দেখতে পাবে।');
@@ -1117,27 +1078,24 @@
                 let data = snapshot.val();
                 if(data) {
                     categories = Object.values(data);
-                    // Ensure 'All/সবগুলো' tab stays at the top/beginning
                     if (!categories.find(c => c.id === 'all')) {
                         categories.unshift(defaultCategories[0]);
                     }
                 } else {
-                    // Seed defaults if empty
                     categories = defaultCategories;
                     defaultCategories.forEach(c => db.ref('categories').push(c));
                 }
                 renderCategories();
             });
 
-            // Listen to Realtime Products from Firebase (Real-time updates across the globe)
+            // Listen to Realtime Products from Firebase (Real-time global sync)
             db.ref('products').on('value', (snapshot) => {
                 let data = snapshot.val();
                 if(data) {
-                    products = Object.values(data);
-                    // Reverse to keep newer items on top
-                    products.reverse();
+                    // Safe cloning to avoid mutation tracking errors
+                    let rawProducts = Object.values(data);
+                    products = [...rawProducts].reverse();
                 } else {
-                    // Seed defaults if empty
                     products = defaultProducts;
                     defaultProducts.forEach(p => db.ref('products').push(p));
                 }
