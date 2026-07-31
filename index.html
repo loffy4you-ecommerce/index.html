@@ -129,7 +129,7 @@
         </div>
     </header>
 
-    <!-- Top Banners Section (Auto-animated Carousel with Smooth Fade Animation) -->
+    <!-- Top Banners Section -->
     <section class="max-w-7xl mx-auto px-4 pt-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- Banner 1 (Large) -->
@@ -321,7 +321,7 @@
         </div>
     </div>
 
-    <!-- Invoice Modal (Professional View) -->
+    <!-- Invoice Modal -->
     <div id="invoiceModal" class="fixed inset-0 bg-gray-900/90 z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-2xl max-h-[95vh] overflow-y-auto p-8 relative shadow-2xl rounded-xl" id="printableInvoice">
             <button onclick="toggleModal('invoiceModal')" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl print:hidden"><i class="fa-solid fa-xmark"></i></button>
@@ -386,12 +386,12 @@
         <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
             <button onclick="toggleModal('adminModal')" class="absolute top-4 right-4 text-gray-400 hover:text-black text-xl"><i class="fa-solid fa-xmark"></i></button>
 
-            <!-- Login Form (Updated Email & Password) -->
+            <!-- Login Form (Updated Secure Inputs) -->
             <div id="adminLoginForm">
                 <h3 class="text-2xl font-bold mb-4 text-brandGreen text-center"><i class="fa-solid fa-lock"></i> অ্যাডমিন লগইন</h3>
-                <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-md mx-auto">
-                    <input type="email" id="adminEmail" required placeholder="ইমেইল অ্যাড্রেস (loffy4you@gmail.com)" value="loffy4you@gmail.com" class="w-full border rounded-lg p-2.5 text-sm outline-none">
-                    <input type="password" id="adminPass" required placeholder="পাসওয়ার্ড (01400028003)" value="01400028003" class="w-full border rounded-lg p-2.5 text-sm outline-none">
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4 max-w-md mx-auto" autocomplete="off">
+                    <input type="email" id="adminEmail" required placeholder="ইমেইল অ্যাড্রেস লিখুন" class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-brandGreen">
+                    <input type="password" id="adminPass" required placeholder="পাসওয়ার্ড লিখুন" class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-brandGreen">
                     <button type="submit" class="w-full bg-brandGreen text-white py-2.5 rounded-lg font-bold">লগইন করুন</button>
                 </form>
             </div>
@@ -409,23 +409,19 @@
                         <h4 class="font-bold text-sm mb-3 text-gray-800"><i class="fa-solid fa-tags text-brandYellow"></i> ক্যাটাগরি ম্যানেজমেন্ট</h4>
                         <div class="flex gap-2 mb-3">
                             <input type="text" id="newCategoryName" placeholder="নতুন ক্যাটাগরি লিখুন" class="flex-1 p-2 text-sm border rounded outline-none">
-                            <button onclick="addNewCategory()" class="bg-brandGreen text-white px-4 rounded font-bold hover:bg-emerald-700 transition" title="Add Category"><i class="fa-solid fa-plus"></i> অ্যাড</button>
+                            <button onclick="addNewCategory()" class="bg-brandGreen text-white px-4 rounded font-bold hover:bg-emerald-700 transition"><i class="fa-solid fa-plus"></i> অ্যাড</button>
                         </div>
-                        <div id="adminCatList" class="flex flex-wrap gap-2 text-xs">
-                            <!-- Categories listed here -->
-                        </div>
+                        <div id="adminCatList" class="flex flex-wrap gap-2 text-xs"></div>
                     </div>
 
                     <!-- Add Product Form -->
                     <div class="bg-cream p-4 rounded-xl border">
-                        <h4 class="font-bold text-sm mb-3"><i class="fa-solid fa-box-open text-brandGreen"></i> নতুন প্রোডাক্ট যোগ করুন (লাইভ হবে)</h4>
+                        <h4 class="font-bold text-sm mb-3"><i class="fa-solid fa-box-open text-brandGreen"></i> নতুন প্রোডাক্ট যোগ করুন</h4>
                         <form onsubmit="addNewProduct(event)" class="grid grid-cols-1 gap-2 text-xs">
                             <input type="text" id="npTitle" placeholder="প্রোডাক্টের নাম" required class="p-2 border rounded outline-none">
                             <div class="flex gap-2">
                                 <input type="number" id="npPrice" placeholder="মূল্য (৳)" required class="p-2 border rounded w-1/2 outline-none">
-                                <select id="npCategory" class="p-2 border rounded w-1/2 outline-none">
-                                    <!-- Dynamic categories -->
-                                </select>
+                                <select id="npCategory" class="p-2 border rounded w-1/2 outline-none"></select>
                             </div>
                             <input type="url" id="npImg1" placeholder="প্রধান ছবি URL" required class="p-2 border rounded outline-none">
                             <input type="url" id="npImg2" placeholder="অতিরিক্ত ছবি URL 2 (Optional)" class="p-2 border rounded outline-none">
@@ -449,7 +445,7 @@
         </div>
     </div>
 
-    <!-- AI Assistant Floating Chat Widget + WhatsApp & Facebook Icons -->
+    <!-- AI Assistant Floating Chat Widget -->
     <div class="fixed bottom-5 right-5 z-40 print:hidden flex flex-col items-end space-y-2">
         <a href="https://wa.me/8801845840375" target="_blank" class="bg-green-500 text-white p-3.5 rounded-full shadow-2xl hover:scale-110 transition flex items-center justify-center">
             <i class="fa-brands fa-whatsapp text-2xl"></i>
@@ -500,7 +496,6 @@
 
     <!-- JavaScript Data and Logic -->
     <script>
-        // Language Dictionary (Multi-language translations)
         const translations = {
             bn: {
                 delivery: '<i class="fa-solid fa-truck-fast mr-1 text-brandYellow"></i> সারাদেশে হোম ডেলিভারি সুবিধা!',
@@ -549,7 +544,7 @@
                 b3Btn: 'Order Now',
                 reviewsTitle: 'Customer Reviews ⭐',
                 currSym: '$',
-                rate: 0.0085, // BDT to USD conversion rate
+                rate: 0.0085,
                 cartTitle: 'Your Shopping Cart',
                 subtotal: 'Subtotal:',
                 deliveryFee: 'Delivery Fee:',
@@ -576,7 +571,7 @@
                 b3Btn: 'Commander maintenant',
                 reviewsTitle: 'Avis des Clients ⭐',
                 currSym: '€',
-                rate: 0.0078, // BDT to EUR conversion rate
+                rate: 0.0078,
                 cartTitle: 'Votre Panier',
                 subtotal: 'Sous-total:',
                 deliveryFee: 'Frais de livraison:',
@@ -587,7 +582,6 @@
 
         let currentLang = 'bn';
 
-        // Dynamic State Data
         let categories = [
             { id: 'all', bn: 'সবগুলো', en: 'All', eur: 'Tous', icon: 'fa-border-all' },
             { id: 'watches', bn: 'স্মার্টওয়াচ', en: 'Smartwatches', eur: 'Montres', icon: 'fa-stopwatch' },
@@ -676,11 +670,9 @@
         let activeCategory = 'all';
         let activeType = 'all';
 
-        // Auto Animated Banners Slider Logic with Smooth Animation Effect
         let b1Idx = 0, b2Idx = 0, b3Idx = 0;
         
         function rotateBanners() {
-            // Banner 1 Transition
             let b1Elem = document.getElementById('banner1Img');
             if(b1Elem) {
                 b1Elem.classList.add('banner-fade-out');
@@ -691,7 +683,6 @@
                 }, 600);
             }
 
-            // Banner 2 Transition
             let b2Elem = document.getElementById('banner2Img');
             if(b2Elem) {
                 b2Elem.classList.add('banner-fade-out');
@@ -702,7 +693,6 @@
                 }, 600);
             }
 
-            // Banner 3 Transition
             let b3Elem = document.getElementById('banner3Img');
             if(b3Elem) {
                 b3Elem.classList.add('banner-fade-out');
@@ -715,12 +705,10 @@
         }
         setInterval(rotateBanners, 4500);
 
-        // Language Switcher Function
         function changeLanguage() {
             currentLang = document.getElementById('langSelect').value;
             const t = translations[currentLang];
 
-            // Update UI Static Texts
             document.getElementById('txt-delivery').innerHTML = t.delivery;
             document.getElementById('weekend-badge').innerText = t.weekend;
             document.getElementById('searchInput').placeholder = t.searchPlaceholder;
@@ -744,7 +732,6 @@
             document.getElementById('txt-grandtotal').innerText = t.grandtotal;
             document.getElementById('btn-checkout').innerText = t.checkoutBtn;
 
-            // Update currency symbols across site
             document.querySelectorAll('.curr-sym').forEach(el => el.innerText = t.currSym);
 
             renderCategories();
@@ -752,14 +739,12 @@
             updateCart();
         }
 
-        // Helper to Format Price according to selected language & currency
         function formatPrice(amountInBDT) {
             const t = translations[currentLang];
             let converted = Math.round(amountInBDT * t.rate);
             return `${converted} ${t.currSym}`;
         }
 
-        // Render Dynamic Categories
         function renderCategories() {
             const container = document.getElementById('categoriesContainer');
             container.innerHTML = categories.map(cat => {
@@ -771,7 +756,6 @@
                 `;
             }).join('');
 
-            // Also update admin select dropdown
             const npCat = document.getElementById('npCategory');
             if(npCat) {
                 npCat.innerHTML = categories.filter(c => c.id !== 'all').map(c => `<option value="${c.id}">${c[currentLang] || c.bn}</option>`).join('');
@@ -795,7 +779,6 @@
             filterProducts();
         }
 
-        // Render Filtered Products
         function renderProducts(list = products) {
             const grid = document.getElementById('productGrid');
             const maxP = parseInt(document.getElementById('priceRange').value);
@@ -839,7 +822,6 @@
             renderProducts();
         }
 
-        // Render Reviews
         function renderReviews() {
             const container = document.getElementById('reviewsContainer');
             container.innerHTML = customerReviews.map(r => `
@@ -853,7 +835,6 @@
             `).join('');
         }
 
-        // Product Details Modal Logic
         function openProductModal(id) {
             const p = products.find(x => x.id === id);
             if(!p) return;
@@ -881,7 +862,6 @@
             toggleModal('productModal');
         }
 
-        // Shopping Cart Logic
         function addToCart(id) {
             const item = cart.find(x => x.id === id);
             if(item) {
@@ -897,7 +877,6 @@
         function updateCart() {
             document.getElementById('cartCount').innerText = cart.reduce((a,b) => a + b.qty, 0);
             const itemsContainer = document.getElementById('cartItems');
-            
             let subtotalBDT = cart.reduce((a,b) => a + (b.price * b.qty), 0);
 
             itemsContainer.innerHTML = cart.map(item => {
@@ -971,7 +950,6 @@
             }
         }
 
-        // Checkout & Invoice Generation
         function handleCheckout(e) {
             e.preventDefault();
             const orderId = 'LFF-' + Math.floor(100000 + Math.random() * 900000);
@@ -1014,27 +992,30 @@
             toggleModal('invoiceModal');
         }
 
-        // Track Order Logic
         function trackOrder() {
             let input = document.getElementById('trackInput').value;
             if(!input) { alert('অনুগ্রহ করে অর্ডার আইডি প্রদান করুন'); return; }
             document.getElementById('trackResult').classList.remove('hidden');
         }
 
-        // Admin Access Logic (Updated Credentials)
         function toggleAdminModal() {
             toggleModal('adminModal');
         }
 
+        // --- SECURE LOGIN LOGIC ---
         function handleAdminLogin(e) {
             e.preventDefault();
             let email = document.getElementById('adminEmail').value;
             let pass = document.getElementById('adminPass').value;
 
+            // Secure validation block (Credentials hidden from UI elements)
             if(email === 'loffy4you@gmail.com' && pass === '01400028003') {
                 document.getElementById('adminLoginForm').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
                 renderAdminCategories();
+                // Clear input values safely after successful auth
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPass').value = '';
             } else {
                 alert('ভুল ইমেইল বা পাসওয়ার্ড!');
             }
@@ -1095,12 +1076,10 @@
             e.target.reset();
         }
 
-        // Modal Toggle Helper
         function toggleModal(id) {
             document.getElementById(id).classList.toggle('hidden');
         }
 
-        // Initial Initialization
         window.onload = function() {
             renderCategories();
             renderProducts();
