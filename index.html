@@ -172,7 +172,7 @@
 
         <!-- Price Range Filter -->
         <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-gray-600" id="txt-maxprice">সর্বোচ্চ দাম: <span id="priceVal">5000</span> <span class="curr-sym">৳</span></span>
+            <span class="text-xs font-bold text-gray-600" id="txt-maxprice">সর্বোচ্চ দাম: <span id="priceVal">15000</span> <span class="curr-sym">৳</span></span>
             <input type="range" id="priceRange" min="100" max="15000" step="100" value="15000" oninput="filterProducts()" class="accent-brandGreen cursor-pointer">
         </div>
     </section>
@@ -297,7 +297,7 @@
 
                     <p class="text-xs mb-2" id="txt-pay-desc">নিচের নম্বরে **Send Money** করে ট্রানজ্যাকশন আইডি এবং স্ক্রিনশট রিসিট আপলোড করুন:</p>
                     <div class="bg-gray-100 p-2.5 rounded-lg flex items-center justify-between mb-3 border">
-                        <span class="font-mono font-bold text-base text-gray-800" id="merchantNumber">+8801778016695</span>
+                        <span class="font-mono font-bold text-base text-gray-800" id="merchantNumber">+880 1845-840375</span>
                         <button type="button" onclick="navigator.clipboard.writeText('+8801845840375'); alert('নম্বর কপি হয়েছে!');" class="text-xs bg-gray-800 text-white px-2.5 py-1 rounded">Copy</button>
                     </div>
 
@@ -582,15 +582,18 @@
 
         let currentLang = 'bn';
 
-        let categories = [
+        // Load Categories from LocalStorage or use default
+        let defaultCategories = [
             { id: 'all', bn: 'সবগুলো', en: 'All', eur: 'Tous', icon: 'fa-border-all' },
             { id: 'watches', bn: 'স্মার্টওয়াচ', en: 'Smartwatches', eur: 'Montres', icon: 'fa-stopwatch' },
             { id: 'glasses', bn: 'সানগ্লাস', en: 'Sunglasses', eur: 'Lunettes', icon: 'fa-glasses' },
             { id: 'covers', bn: 'মোবাইল কভার', en: 'Mobile Covers', eur: 'Coques', icon: 'fa-mobile-screen' },
             { id: 'jewelry', bn: 'জুয়েলারি', en: 'Jewelry', eur: 'Bijoux', icon: 'fa-gem' }
         ];
+        let categories = JSON.parse(localStorage.getItem('loffy_categories')) || defaultCategories;
 
-        let products = [
+        // Load Products from LocalStorage or use default
+        let defaultProducts = [
             {
                 id: 1,
                 title: { bn: "T800 Ultra Smartwatch", en: "T800 Ultra Smartwatch", eur: "Montre T800 Ultra" },
@@ -640,6 +643,7 @@
                 ]
             }
         ];
+        let products = JSON.parse(localStorage.getItem('loffy_products')) || defaultProducts;
 
         let bannerImagesGroup1 = [
             "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
@@ -768,14 +772,17 @@
             filterProducts();
         }
 
+        // Fix function argument mapping issue
         function filterType(type) {
             activeType = type;
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-brandGreen', 'text-white');
                 btn.classList.add('text-gray-700');
             });
-            event.target.classList.add('bg-brandGreen', 'text-white');
-            event.target.classList.remove('text-gray-700');
+            if(window.event && window.event.target) {
+                window.event.target.classList.add('bg-brandGreen', 'text-white');
+                window.event.target.classList.remove('text-gray-700');
+            }
             filterProducts();
         }
 
@@ -900,7 +907,7 @@
             }).join('');
 
             document.getElementById('cartSubtotal').innerHTML = `${formatPrice(subtotalBDT)}`;
-            let deliveryBDT = 80;
+            let deliveryBDT = document.getElementById('delArea') ? (document.getElementById('delArea').value === 'inside' ? 80 : 150) : 80;
             document.getElementById('cartDelivery').innerHTML = `${formatPrice(deliveryBDT)}`;
             document.getElementById('cartTotal').innerHTML = `${formatPrice(subtotalBDT + deliveryBDT)}`;
         }
@@ -1008,12 +1015,11 @@
             let email = document.getElementById('adminEmail').value;
             let pass = document.getElementById('adminPass').value;
 
-            // Secure validation block (Credentials hidden from UI elements)
+            // Secure validation block
             if(email === 'loffy4you@gmail.com' && pass === '01400028003') {
                 document.getElementById('adminLoginForm').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
                 renderAdminCategories();
-                // Clear input values safely after successful auth
                 document.getElementById('adminEmail').value = '';
                 document.getElementById('adminPass').value = '';
             } else {
@@ -1039,6 +1045,10 @@
             if(!name) return;
             let id = 'cat_' + Date.now();
             categories.push({ id, bn: name, en: name, eur: name, icon: 'fa-tag' });
+            
+            // Save updated categories to local storage
+            localStorage.setItem('loffy_categories', JSON.stringify(categories));
+            
             document.getElementById('newCategoryName').value = '';
             renderCategories();
             renderAdminCategories();
@@ -1070,7 +1080,12 @@
                 images: imgs
             };
 
+            // Unshift puts new products at the top/beginning of the array
             products.unshift(newP);
+            
+            // Save updated products list to local storage
+            localStorage.setItem('loffy_products', JSON.stringify(products));
+            
             renderProducts();
             alert('নতুন প্রোডাক্ট লাইভ পাবলিশ হয়েছে!');
             e.target.reset();
